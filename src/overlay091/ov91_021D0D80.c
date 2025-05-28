@@ -23,6 +23,7 @@
 #include "pokemon.h"
 #include "render_text.h"
 #include "render_window.h"
+#include "screen_fade.h"
 #include "sound_playback.h"
 #include "sprite.h"
 #include "sprite_system.h"
@@ -31,7 +32,6 @@
 #include "string_template.h"
 #include "system.h"
 #include "text.h"
-#include "unk_0200F174.h"
 #include "unk_0207C908.h"
 #include "unk_0208C098.h"
 #include "unk_02094EDC.h"
@@ -53,7 +53,7 @@ typedef struct {
     SpriteManager *unk_114;
     ManagedSprite *unk_118[13];
     PokemonSummary unk_14C;
-    OverlayManager *unk_17C;
+    ApplicationManager *appMan;
     int unk_180;
     u8 unk_184;
     u8 unk_185;
@@ -339,15 +339,15 @@ static const SpriteTemplate Unk_ov91_021D28FC[] = {
     },
 };
 
-int ov91_021D0D80(OverlayManager *param0, int *param1)
+int ov91_021D0D80(ApplicationManager *appMan, int *param1)
 {
     UnkStruct_ov91_021D0ED8 *v0;
 
     Heap_Create(HEAP_ID_APPLICATION, HEAP_ID_67, 0x20000);
 
-    v0 = OverlayManager_NewData(param0, sizeof(UnkStruct_ov91_021D0ED8), HEAP_ID_67);
+    v0 = ApplicationManager_NewData(appMan, sizeof(UnkStruct_ov91_021D0ED8), HEAP_ID_67);
     memset(v0, 0, sizeof(UnkStruct_ov91_021D0ED8));
-    v0->unk_00 = OverlayManager_Args(param0);
+    v0->unk_00 = ApplicationManager_Args(appMan);
 
     ov91_021D0ED8(v0);
     ov91_021D2548(v0, v0->unk_00->unk_10, 0);
@@ -363,9 +363,9 @@ int ov91_021D0D80(OverlayManager *param0, int *param1)
     return 1;
 }
 
-int ov91_021D0E08(OverlayManager *param0, int *param1)
+int ov91_021D0E08(ApplicationManager *appMan, int *param1)
 {
-    UnkStruct_ov91_021D0ED8 *v0 = OverlayManager_Data(param0);
+    UnkStruct_ov91_021D0ED8 *v0 = ApplicationManager_Data(appMan);
 
     switch (*param1) {
     case 0:
@@ -414,13 +414,13 @@ int ov91_021D0E08(OverlayManager *param0, int *param1)
     return 0;
 }
 
-int ov91_021D0EBC(OverlayManager *param0, int *param1)
+int ov91_021D0EBC(ApplicationManager *appMan, int *param1)
 {
-    UnkStruct_ov91_021D0ED8 *v0 = OverlayManager_Data(param0);
+    UnkStruct_ov91_021D0ED8 *v0 = ApplicationManager_Data(appMan);
 
     ov91_021D0F6C(v0);
 
-    OverlayManager_FreeData(param0);
+    ApplicationManager_FreeData(appMan);
     Heap_Destroy(HEAP_ID_67);
 
     return 1;
@@ -637,7 +637,7 @@ static void ov91_021D11F0(UnkStruct_ov91_021D0ED8 *param0)
 
 static int ov91_021D1214(UnkStruct_ov91_021D0ED8 *param0)
 {
-    if (IsScreenTransitionDone() == 1) {
+    if (IsScreenFadeDone() == TRUE) {
         return param0->unk_180;
     }
 
@@ -1505,14 +1505,14 @@ static int ov91_021D261C(UnkStruct_ov91_021D0ED8 *param0)
 
     PokemonSummaryScreen_FlagVisiblePages(&param0->unk_14C, v0);
 
-    param0->unk_17C = OverlayManager_New(&gPokemonSummaryScreenApp, &param0->unk_14C, 67);
+    param0->appMan = ApplicationManager_New(&gPokemonSummaryScreenApp, &param0->unk_14C, 67);
     return 12;
 }
 
 static int ov91_021D26AC(UnkStruct_ov91_021D0ED8 *param0)
 {
-    if (OverlayManager_Exec(param0->unk_17C)) {
-        OverlayManager_Free(param0->unk_17C);
+    if (ApplicationManager_Exec(param0->appMan)) {
+        ApplicationManager_Free(param0->appMan);
         ov91_021D0ED8(param0);
         ov91_021D2548(param0, param0->unk_00->unk_10, 1);
         ov91_021D2574(param0, 0);

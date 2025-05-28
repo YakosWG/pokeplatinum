@@ -32,11 +32,11 @@
 #include "pokemon_sprite.h"
 #include "save_player.h"
 #include "savedata.h"
+#include "screen_fade.h"
 #include "sound.h"
 #include "system.h"
 #include "touch_pad.h"
 #include "touch_screen_actions.h"
-#include "unk_0200F174.h"
 #include "unk_02015F84.h"
 #include "unk_02024220.h"
 #include "unk_02028124.h"
@@ -64,18 +64,18 @@ typedef struct {
     int unk_14;
 } UnkStruct_02097F38;
 
-static int sub_02097B18(OverlayManager *param0, int *param1);
-static int sub_02097D30(OverlayManager *param0, int *param1);
-static int sub_02097D88(OverlayManager *param0, int *param1);
+static int sub_02097B18(ApplicationManager *appMan, int *param1);
+static int sub_02097D30(ApplicationManager *appMan, int *param1);
+static int sub_02097D88(ApplicationManager *appMan, int *param1);
 
-const OverlayManagerTemplate Unk_020F64C0 = {
+const ApplicationManagerTemplate Unk_020F64C0 = {
     sub_02097B18,
     sub_02097D30,
     sub_02097D88,
     FS_OVERLAY_ID(overlay76),
 };
 
-static int sub_02097B18(OverlayManager *param0, int *param1)
+static int sub_02097B18(ApplicationManager *appMan, int *param1)
 {
     UnkStruct_ov76_0223DE00 *v0;
     UnkStruct_02097F18 *v1;
@@ -84,11 +84,11 @@ static int sub_02097B18(OverlayManager *param0, int *param1)
     ov76_0223EB20(53);
     ov76_0223D3A0();
 
-    v0 = OverlayManager_NewData(param0, sizeof(UnkStruct_ov76_0223DE00), HEAP_ID_53);
+    v0 = ApplicationManager_NewData(appMan, sizeof(UnkStruct_ov76_0223DE00), HEAP_ID_53);
     memset(v0, 0, sizeof(UnkStruct_ov76_0223DE00));
 
     v0->unk_D4.unk_15C = ov76_0223BE6C();
-    v1 = OverlayManager_Args(param0);
+    v1 = ApplicationManager_Args(appMan);
     v0->unk_00 = v1;
     v0->unk_42C = NARC_ctor(NARC_INDEX_POKETOOL__POKE_EDIT__PL_POKE_DATA, HEAP_ID_53);
     v0->unk_428 = Pokemon_New(HEAP_ID_53);
@@ -185,13 +185,13 @@ static int sub_02097B18(OverlayManager *param0, int *param1)
     return 1;
 }
 
-static int sub_02097D30(OverlayManager *param0, int *param1)
+static int sub_02097D30(ApplicationManager *appMan, int *param1)
 {
-    UnkStruct_ov76_0223DE00 *v0 = OverlayManager_Data(param0);
+    UnkStruct_ov76_0223DE00 *v0 = ApplicationManager_Data(appMan);
 
     switch (*param1) {
     case 0:
-        if (IsScreenTransitionDone() == 1) {
+        if (IsScreenFadeDone() == TRUE) {
             *param1 = 1;
         }
         break;
@@ -207,7 +207,7 @@ static int sub_02097D30(OverlayManager *param0, int *param1)
         ov76_0223BF50();
     } break;
     case 2:
-        if (IsScreenTransitionDone() == 1) {
+        if (IsScreenFadeDone() == TRUE) {
             return 1;
         }
         break;
@@ -216,9 +216,9 @@ static int sub_02097D30(OverlayManager *param0, int *param1)
     return 0;
 }
 
-static int sub_02097D88(OverlayManager *param0, int *param1)
+static int sub_02097D88(ApplicationManager *appMan, int *param1)
 {
-    UnkStruct_ov76_0223DE00 *v0 = OverlayManager_Data(param0);
+    UnkStruct_ov76_0223DE00 *v0 = ApplicationManager_Data(appMan);
 
     GXLayers_EngineAToggleLayers(GX_PLANEMASK_BG0, 0);
     GXLayers_EngineAToggleLayers(GX_PLANEMASK_BG1, 0);
@@ -253,7 +253,7 @@ static int sub_02097D88(OverlayManager *param0, int *param1)
     sub_020242C4(v0->unk_D4.unk_15C);
     ov76_0223EB54(53);
     NARC_dtor(v0->unk_42C);
-    OverlayManager_FreeData(param0);
+    ApplicationManager_FreeData(appMan);
 
     {
         u32 v1;
