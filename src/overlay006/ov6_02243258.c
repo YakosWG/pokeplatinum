@@ -3,6 +3,8 @@
 #include <nitro.h>
 #include <string.h>
 
+#include "constants/heap.h"
+
 #include "struct_decls/struct_02061AB4_decl.h"
 #include "struct_decls/struct_020711EC_decl.h"
 
@@ -31,18 +33,18 @@
 #include "unk_020131EC.h"
 #include "unk_020711EC.h"
 
-typedef struct {
-    int unk_00;
-    int unk_04;
+typedef struct HMCutIn {
+    int state;
+    int isFinished;
     int unk_08;
-    int unk_0C;
+    int playerGender;
     int unk_10;
     int unk_14;
     int unk_18;
     int unk_1C;
-    u32 unk_20;
-    u16 unk_24;
-    u16 unk_26;
+    u32 dummy_20;
+    u16 bgPriority0;
+    u16 bgPriority3;
     int unk_28;
     int unk_2C;
     u32 unk_30;
@@ -56,7 +58,7 @@ typedef struct {
     fx32 unk_50;
     fx32 unk_54;
     fx32 unk_58;
-    Pokemon *unk_5C;
+    Pokemon *pokemon;
     FieldSystem *fieldSystem;
     NNSG2dScreenData *unk_64;
     NNSG2dCharacterData *unk_68;
@@ -83,7 +85,7 @@ typedef struct {
     void *unk_274;
     SysTask *unk_278;
     SysTask *unk_27C;
-} UnkStruct_ov6_02243FFC;
+} HMCutIn;
 
 typedef struct {
     u32 unk_00;
@@ -91,7 +93,7 @@ typedef struct {
 } UnkStruct_ov6_02249108;
 
 typedef struct {
-    UnkStruct_ov6_02243FFC *unk_00;
+    HMCutIn *unk_00;
 } UnkStruct_ov6_0224543C;
 
 typedef struct {
@@ -119,7 +121,7 @@ typedef struct {
 } UnkStruct_ov6_02249198;
 
 typedef struct {
-    UnkStruct_ov6_02243FFC *unk_00;
+    HMCutIn *unk_00;
     Sprite *unk_04;
 } UnkStruct_ov6_02245B4C;
 
@@ -129,7 +131,7 @@ typedef struct {
     int unk_08;
     int unk_0C;
     VecFx32 unk_10;
-    UnkStruct_ov6_02243FFC *unk_1C;
+    HMCutIn *unk_1C;
     Sprite *unk_20;
 } UnkStruct_ov6_02245B74;
 
@@ -208,7 +210,7 @@ typedef struct {
 typedef struct {
     int unk_00;
     int unk_04;
-    UnkStruct_ov6_02243FFC *unk_08;
+    HMCutIn *unk_08;
     VecFx32 unk_0C;
 } UnkStruct_ov6_02245328;
 
@@ -236,82 +238,82 @@ typedef struct {
     fx32 unk_24;
     fx32 unk_28;
     MapObject *unk_2C;
-    UnkStruct_ov6_02243FFC *unk_30;
+    HMCutIn *unk_30;
 } UnkStruct_ov100_021D4890;
 
 typedef struct {
     Sprite *unk_00;
-    UnkStruct_ov6_02243FFC *unk_04;
+    HMCutIn *unk_04;
 } UnkStruct_ov6_02245F80;
 
-static UnkStruct_ov6_02243FFC *ov6_02243FDC(FieldSystem *fieldSystem);
-static void ov6_02243FFC(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244004(SysTask *param0, void *param1);
-static void ov6_022443B8(SysTask *param0, void *param1);
-static void ov6_0224464C(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244674(UnkStruct_ov6_02243FFC *param0);
-static void ov6_0224469C(UnkStruct_ov6_02243FFC *param0);
+static HMCutIn *HMCutIn_New(FieldSystem *fieldSystem);
+static void HMCutIn_Free(HMCutIn *cutIn);
+static void SysTask_CutIn(SysTask *param0, void *param1);
+static void SysTask_CutInFly(SysTask *param0, void *param1);
+static void ov6_0224464C(HMCutIn *cutIn);
+static void ov6_02244674(HMCutIn *cutIn);
+static void ov6_0224469C(HMCutIn *cutIn);
 static void ov6_022446B8(SysTask *param0, void *param1);
 static void ov6_02244734(SysTask *param0, void *param1);
 static void ov6_022447B4(SysTask *param0, void *param1);
 static void ov6_022447EC(SysTask *param0, void *param1);
-static void ov6_0224481C(UnkStruct_ov6_02243FFC *param0);
-static void ov6_022448C8(UnkStruct_ov6_02243FFC *param0);
-static NARC *ov6_0224491C(void);
-static void ov6_02244928(UnkStruct_ov6_02243FFC *param0, NARC *param1);
-static void ov6_02244B6C(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244C10(UnkStruct_ov6_02243FFC *param0);
-static Sprite *ov6_02244C20(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1, u32 param2, u32 param3, u32 param4, u32 param5, int param6, int param7);
-static Sprite *ov6_02244CD4(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1, int param2, int param3);
-static Sprite *ov6_02244CFC(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1);
+static void ov6_0224481C(HMCutIn *cutIn);
+static void ov6_022448C8(HMCutIn *cutIn);
+static NARC *GetFieldCutinNarc(void);
+static void ov6_02244928(HMCutIn *cutIn, NARC *param1);
+static void ov6_02244B6C(HMCutIn *cutIn);
+static void ov6_02244C10(HMCutIn *cutIn);
+static Sprite *ov6_02244C20(HMCutIn *cutIn, const VecFx32 *param1, u32 param2, u32 param3, u32 param4, u32 param5, int param6, int param7);
+static Sprite *ov6_02244CD4(HMCutIn *cutIn, const VecFx32 *param1, int param2, int param3);
+static Sprite *ov6_02244CFC(HMCutIn *cutIn, const VecFx32 *param1);
 static void ov6_02244D34(Sprite *param0);
-static Sprite *ov6_02244D4C(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1, int param2, int param3);
-static void ov6_02244DB4(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244E54(NARC *param0, u32 param1, NNSG2dPaletteData **param2);
-static void ov6_02244E7C(BgConfig *param0, NARC *param1, u32 param2, NNSG2dCharacterData **param3);
-static void ov6_02244EB4(BgConfig *param0, NARC *param1, u32 param2, NNSG2dScreenData **param3);
+static Sprite *ov6_02244D4C(HMCutIn *cutIn, const VecFx32 *param1, int param2, int param3);
+static void ov6_02244DB4(HMCutIn *cutIn);
+static void ov6_02244E54(NARC *narc, u32 memberIndex, NNSG2dPaletteData **plttData);
+static void ov6_02244E7C(BgConfig *bgConfig, NARC *narc, u32 memberIndex, NNSG2dCharacterData **charData);
+static void ov6_02244EB4(BgConfig *bgConfig, NARC *narc, u32 memberIndex, NNSG2dScreenData **screenData);
 static void ov6_02244F20(BgConfig *param0);
-static void ov6_02244F2C(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244F50(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244F58(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244F60(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244F74(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244F80(UnkStruct_ov6_02243FFC *param0, fx32 param1, fx32 param2, fx32 param3, fx32 param4);
-static void ov6_02244F8C(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02244FB4(UnkStruct_ov6_02243FFC *param0);
+static void ov6_02244F2C(HMCutIn *cutIn);
+static void ov6_02244F50(HMCutIn *cutIn);
+static void ov6_02244F58(HMCutIn *cutIn);
+static void ov6_02244F60(HMCutIn *cutIn);
+static void ov6_02244F74(HMCutIn *cutIn);
+static void ov6_02244F80(HMCutIn *cutIn, fx32 param1, fx32 param2, fx32 param3, fx32 param4);
+static void ov6_02244F8C(HMCutIn *cutIn);
+static void ov6_02244FB4(HMCutIn *cutIn);
 static void ov6_02244FE4(SysTask *param0, void *param1);
-static void ov6_0224508C(UnkStruct_ov6_02243FFC *param0, PokemonSpriteTemplate *param1);
+static void ov6_0224508C(HMCutIn *cutIn, PokemonSpriteTemplate *param1);
 static void *ov6_0224509C(Pokemon *param0, PokemonSpriteTemplate *param1, u32 heapID);
 static void *ov6_022450E4(PokemonSpriteTemplate *param0, u32 heapID);
-static SpriteResource *ov6_022450F4(UnkStruct_ov6_02243FFC *param0, NARC *param1);
-static void ov6_02245118(UnkStruct_ov6_02243FFC *param0, void *param1);
-static SpriteResource *ov6_0224514C(UnkStruct_ov6_02243FFC *param0, NARC *param1);
-static void ov6_02245170(UnkStruct_ov6_02243FFC *param0, void *param1);
-static void ov6_022451B8(UnkStruct_ov6_02243FFC *param0);
-static Sprite *ov6_0224529C(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1);
-static void ov6_022452BC(UnkStruct_ov6_02243FFC *param0, int param1);
-static void ov6_02245328(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1, const VecFx32 *param2, int param3, int param4, int param5);
-static void ov6_0224543C(UnkStruct_ov6_02243FFC *param0);
-static void ov6_0224543C(UnkStruct_ov6_02243FFC *param0);
-static int ov6_02245470(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02245480(UnkStruct_ov6_02243FFC *param0);
-static void ov6_0224551C(UnkStruct_ov6_02243FFC *param0);
-static void ov6_022456D4(UnkStruct_ov6_02243FFC *param0);
+static SpriteResource *ov6_022450F4(HMCutIn *param0, NARC *param1);
+static void ov6_02245118(HMCutIn *cutIn, void *param1);
+static SpriteResource *ov6_0224514C(HMCutIn *param0, NARC *param1);
+static void ov6_02245170(HMCutIn *cutIn, void *param1);
+static void ov6_022451B8(HMCutIn *cutIn);
+static Sprite *ov6_0224529C(HMCutIn *cutIn, const VecFx32 *param1);
+static void ov6_022452BC(HMCutIn *cutIn, int param1);
+static void ov6_02245328(HMCutIn *cutIn, const VecFx32 *param1, const VecFx32 *param2, int param3, int param4, int param5);
+static void ov6_0224543C(HMCutIn *cutIn);
+static void ov6_0224543C(HMCutIn *cutIn);
+static int ov6_02245470(HMCutIn *cutIn);
+static void ov6_02245480(HMCutIn *cutIn);
+static void ov6_0224551C(HMCutIn *cutIn);
+static void ov6_022456D4(HMCutIn *cutIn);
 static UnkStruct_ov101_021D5D90 *ov6_02245B4C(UnkStruct_020711EC *param0, Sprite *param1);
 static void ov6_02245B74(UnkStruct_ov101_021D5D90 *param0);
 static void ov6_02245B80(UnkStruct_ov101_021D5D90 *param0);
 static void ov6_02245BC8(UnkStruct_ov101_021D5D90 *param0);
-static void ov6_02245F64(UnkStruct_ov6_02243FFC *param0, int param1);
-static void ov6_02245FDC(UnkStruct_ov6_02243FFC *param0);
-static void ov6_02246018(UnkStruct_ov6_02243FFC *param0);
+static void ov6_02245F64(HMCutIn *cutIn, int param1);
+static void ov6_02245FDC(HMCutIn *cutIn);
+static void ov6_02246018(HMCutIn *cutIn);
 static void ov6_02243F2C(void);
 static void ov6_02243F50(void);
 static void *ov6_02245F44(u32 heapID, int param1);
 static void ov6_02243F74(FieldSystem *fieldSystem, int param1);
 static void ov6_02245D10(SysTask *param0, void *param1);
 
-int (*const Unk_ov6_022492D8[])(UnkStruct_ov6_02243FFC *);
-int (*const Unk_ov6_02249310[])(UnkStruct_ov6_02243FFC *);
+int (*const Unk_ov6_022492D8[])(HMCutIn *);
+int (*const Unk_ov6_02249310[])(HMCutIn *);
 static const UnkStruct_ov101_021D86B0 Unk_ov6_02249248;
 int (*const *const Unk_ov6_02249198[])(UnkStruct_ov6_02249198 *);
 int (*const Unk_ov6_022490E8[])(UnkStruct_ov6_02249198 *);
@@ -1023,80 +1025,80 @@ static void ov6_02243F74(FieldSystem *fieldSystem, int param1)
     MapObject_SetHidden(v0, param1);
 }
 
-SysTask *ov6_02243F88(FieldSystem *fieldSystem, u32 param1, Pokemon *param2, int param3)
+SysTask *SysTask_CutIn_New(FieldSystem *fieldSystem, u32 param1, Pokemon *shownPokemon, int playerGender)
 {
-    SysTask *v0;
-    UnkStruct_ov6_02243FFC *v1 = ov6_02243FDC(fieldSystem);
+    SysTask *task;
+    HMCutIn *cutIn = HMCutIn_New(fieldSystem);
 
-    v1->unk_5C = param2;
-    v1->unk_0C = param3;
-    v1->unk_20 = param1;
+    cutIn->pokemon = shownPokemon;
+    cutIn->playerGender = playerGender;
+    cutIn->dummy_20 = param1;
 
     if (param1 == 0) {
-        v0 = SysTask_Start(ov6_02244004, v1, 133);
+        task = SysTask_Start(SysTask_CutIn, cutIn, 133);
     } else {
-        v0 = SysTask_Start(ov6_022443B8, v1, 133);
+        task = SysTask_Start(SysTask_CutInFly, cutIn, 133);
     }
 
-    return v0;
+    return task;
 }
 
-int ov6_02243FBC(SysTask *param0)
+int CheckCutInFinished(SysTask *cutInTask)
 {
-    UnkStruct_ov6_02243FFC *v0 = SysTask_GetParam(param0);
-    return v0->unk_04;
+    HMCutIn *cutIn = SysTask_GetParam(cutInTask);
+    return cutIn->isFinished;
 }
 
-void ov6_02243FC8(SysTask *param0)
+void SysTask_CutIn_Done(SysTask *cutInTask)
 {
-    UnkStruct_ov6_02243FFC *v0 = SysTask_GetParam(param0);
+    HMCutIn *cutIn = SysTask_GetParam(cutInTask);
 
-    ov6_02243FFC(v0);
-    SysTask_Done(param0);
+    HMCutIn_Free(cutIn);
+    SysTask_Done(cutInTask);
 }
 
-static UnkStruct_ov6_02243FFC *ov6_02243FDC(FieldSystem *fieldSystem)
+static HMCutIn *HMCutIn_New(FieldSystem *fieldSystem)
 {
-    UnkStruct_ov6_02243FFC *v0 = Heap_AllocFromHeapAtEnd(HEAP_ID_FIELD, (sizeof(UnkStruct_ov6_02243FFC)));
+    HMCutIn *cutIn = Heap_AllocFromHeapAtEnd(HEAP_ID_FIELD, (sizeof(HMCutIn)));
 
-    memset(v0, 0, (sizeof(UnkStruct_ov6_02243FFC)));
-    v0->fieldSystem = fieldSystem;
+    memset(cutIn, 0, (sizeof(HMCutIn)));
+    cutIn->fieldSystem = fieldSystem;
 
-    return v0;
+    return cutIn;
 }
 
-static void ov6_02243FFC(UnkStruct_ov6_02243FFC *param0)
+static void HMCutIn_Free(HMCutIn *cutIn)
 {
-    Heap_Free(param0);
+    Heap_Free(cutIn);
 }
 
-static void ov6_02244004(SysTask *param0, void *param1)
+static void SysTask_CutIn(SysTask *cutInTask, void *hmCutInPtr)
 {
-    int v0;
-    UnkStruct_ov6_02243FFC *v1 = param1;
+    int ret;
+    HMCutIn *cutIn = hmCutInPtr;
 
     do {
-        v0 = Unk_ov6_022492D8[v1->unk_00](v1);
-    } while (v0 == 1);
+        ret = Unk_ov6_022492D8[cutIn->state](cutIn);
+    } while (ret == 1);
 
-    if (v1->unk_10 == 1) {
-        if (v1->unk_244 != NULL) {
-            sub_020713D0(v1->unk_244);
+    if (cutIn->unk_10 == 1) {
+        if (cutIn->unk_244 != NULL) {
+            sub_020713D0(cutIn->unk_244);
         }
 
-        ov6_02244C10(v1);
+        ov6_02244C10(cutIn);
     }
 }
 
-static int ov6_02244038(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244038(HMCutIn *cutIn)
 {
-    ov6_0224481C(param0);
-    ov6_0224464C(param0);
-    param0->unk_00++;
+    ov6_0224481C(cutIn);
+    ov6_0224464C(cutIn);
+    cutIn->state++;
     return 0;
 }
 
-static int ov6_02244050(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244050(HMCutIn *param0)
 {
     if (param0->unk_26C == 0) {
         return 0;
@@ -1115,12 +1117,12 @@ static int ov6_02244050(UnkStruct_ov6_02243FFC *param0)
     ov6_0224469C(param0);
 
     param0->unk_10 = 1;
-    param0->unk_00++;
+    param0->state++;
 
     return 1;
 }
 
-static int ov6_022440C0(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022440C0(HMCutIn *param0)
 {
     ov6_02245FDC(param0);
 
@@ -1131,12 +1133,12 @@ static int ov6_022440C0(UnkStruct_ov6_02243FFC *param0)
     param0->unk_4C = (FX32_ONE * (96 - 1));
     param0->unk_50 = (FX32_ONE * (96 + 1));
     param0->unk_2C = 1;
-    param0->unk_00++;
+    param0->state++;
 
     return 0;
 }
 
-static int ov6_022440F8(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022440F8(HMCutIn *param0)
 {
     param0->unk_2C = 0;
     param0->unk_44 += param0->unk_54;
@@ -1144,7 +1146,7 @@ static int ov6_022440F8(UnkStruct_ov6_02243FFC *param0)
     if (param0->unk_44 <= 0) {
         param0->unk_44 = 0;
         param0->unk_54 = 0x2000;
-        param0->unk_00++;
+        param0->state++;
     }
 
     ov6_02244F80(param0, param0->unk_44, param0->unk_4C, param0->unk_48, param0->unk_50);
@@ -1153,7 +1155,7 @@ static int ov6_022440F8(UnkStruct_ov6_02243FFC *param0)
     return 0;
 }
 
-static int ov6_02244138(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244138(HMCutIn *param0)
 {
     param0->unk_2C = 0;
     param0->unk_4C -= param0->unk_54;
@@ -1177,26 +1179,26 @@ static int ov6_02244138(UnkStruct_ov6_02243FFC *param0)
 
     if ((param0->unk_4C == (FX32_ONE * (96 - 40))) && (param0->unk_50 == (FX32_ONE * (96 + 40)))) {
         ov6_02244D34(param0->unk_248);
-        param0->unk_00++;
+        param0->state++;
     }
 
     return 0;
 }
 
-static int ov6_022441BC(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022441BC(HMCutIn *param0)
 {
     param0->unk_08++;
 
     if (param0->unk_08 >= 15) {
         param0->unk_08 = 0;
         param0->unk_58 = (FX32_ONE * -64);
-        param0->unk_00++;
+        param0->state++;
     }
 
     return 0;
 }
 
-static int ov6_022441DC(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022441DC(HMCutIn *param0)
 {
     const VecFx32 *v0;
     VecFx32 v1;
@@ -1207,14 +1209,14 @@ static int ov6_022441DC(UnkStruct_ov6_02243FFC *param0)
 
     if (v1.x <= (FX32_ONE * (128 + 32))) {
         v1.x = (FX32_ONE * (128 + 64));
-        param0->unk_00++;
+        param0->state++;
     }
 
     Sprite_SetPosition(param0->unk_24C, &v1);
     return 0;
 }
 
-static int ov6_02244228(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244228(HMCutIn *param0)
 {
     const VecFx32 *v0;
     VecFx32 v1;
@@ -1223,10 +1225,10 @@ static int ov6_02244228(UnkStruct_ov6_02243FFC *param0)
 
     if (param0->unk_58 > (FX32_ONE * -2)) {
         param0->unk_58 = (FX32_ONE * -2);
-        param0->unk_00++;
+        param0->state++;
 
         {
-            Pokemon_IsEligibleForAction(param0->unk_5C);
+            Pokemon_IsEligibleForAction(param0->pokemon);
         }
     }
 
@@ -1238,20 +1240,20 @@ static int ov6_02244228(UnkStruct_ov6_02243FFC *param0)
     return 0;
 }
 
-static int ov6_02244284(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244284(HMCutIn *param0)
 {
     param0->unk_08++;
 
     if (param0->unk_08 >= 8) {
         param0->unk_08 = 0;
         param0->unk_58 = (FX32_ONE * -1);
-        param0->unk_00++;
+        param0->state++;
     }
 
     return 0;
 }
 
-static int ov6_022442A4(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022442A4(HMCutIn *param0)
 {
     const VecFx32 *v0;
     VecFx32 v1;
@@ -1270,13 +1272,13 @@ static int ov6_022442A4(UnkStruct_ov6_02243FFC *param0)
 
     if (v1.x <= (FX32_ONE * -40)) {
         param0->unk_54 = 0x1000;
-        param0->unk_00++;
+        param0->state++;
     }
 
     return 0;
 }
 
-static int ov6_02244308(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244308(HMCutIn *param0)
 {
     param0->unk_2C = 0;
     param0->unk_4C += param0->unk_54;
@@ -1300,34 +1302,34 @@ static int ov6_02244308(UnkStruct_ov6_02243FFC *param0)
 
     if ((param0->unk_4C == (FX32_ONE * (96 - 8))) && (param0->unk_50 == (FX32_ONE * (96 + 8)))) {
         ov6_02246018(param0);
-        param0->unk_00++;
+        param0->state++;
     }
 
     return 0;
 }
 
-static int ov6_02244388(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244388(HMCutIn *param0)
 {
     ov6_022448C8(param0);
     param0->unk_10 = 0;
-    param0->unk_00++;
+    param0->state++;
     return 0;
 }
 
-static int ov6_0224439C(UnkStruct_ov6_02243FFC *param0)
+static int ov6_0224439C(HMCutIn *cutIn)
 {
-    ov6_02244FB4(param0);
-    param0->unk_00++;
+    ov6_02244FB4(cutIn);
+    cutIn->state++;
     return 0;
 }
 
-static int ov6_022443B0(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022443B0(HMCutIn *cutIn)
 {
-    param0->unk_04 = 1;
+    cutIn->isFinished = 1;
     return 0;
 }
 
-static int (*const Unk_ov6_022492D8[])(UnkStruct_ov6_02243FFC *) = {
+static int (*const Unk_ov6_022492D8[])(HMCutIn *) = {
     ov6_02244038,
     ov6_02244050,
     ov6_022440C0,
@@ -1344,25 +1346,25 @@ static int (*const Unk_ov6_022492D8[])(UnkStruct_ov6_02243FFC *) = {
     ov6_022443B0
 };
 
-static void ov6_022443B8(SysTask *param0, void *param1)
+static void SysTask_CutInFly(SysTask *param0, void *param1)
 {
     int v0;
-    UnkStruct_ov6_02243FFC *v1 = param1;
+    HMCutIn *cutIn = param1;
 
     do {
-        v0 = Unk_ov6_02249310[v1->unk_00](v1);
+        v0 = Unk_ov6_02249310[cutIn->state](cutIn);
     } while (v0 == 1);
 
-    if (v1->unk_10 == 1) {
-        if (v1->unk_244 != NULL) {
-            sub_020713D0(v1->unk_244);
+    if (cutIn->unk_10 == 1) {
+        if (cutIn->unk_244 != NULL) {
+            sub_020713D0(cutIn->unk_244);
         }
 
-        ov6_02244C10(v1);
+        ov6_02244C10(cutIn);
     }
 }
 
-static int ov6_022443EC(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022443EC(HMCutIn *param0)
 {
     if (param0->unk_26C == 0) {
         return 0;
@@ -1380,27 +1382,27 @@ static int ov6_022443EC(UnkStruct_ov6_02243FFC *param0)
     ov6_0224469C(param0);
 
     param0->unk_10 = 1;
-    param0->unk_00++;
+    param0->state++;
 
     return 1;
 }
 
-static int ov6_0224445C(UnkStruct_ov6_02243FFC *param0)
+static int ov6_0224445C(HMCutIn *param0)
 {
     ov6_022451B8(param0);
-    param0->unk_00++;
+    param0->state++;
     return 0;
 }
 
-static int ov6_02244470(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244470(HMCutIn *param0)
 {
     ov6_02244DB4(param0);
     ov6_02244674(param0);
-    param0->unk_00++;
+    param0->state++;
     return 0;
 }
 
-static int ov6_02244488(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244488(HMCutIn *param0)
 {
     if (param0->unk_26C == 0) {
         return 0;
@@ -1408,39 +1410,39 @@ static int ov6_02244488(UnkStruct_ov6_02243FFC *param0)
 
     ov6_0224469C(param0);
 
-    param0->unk_00++;
+    param0->state++;
     return 1;
 }
 
-static int ov6_022444A8(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022444A8(HMCutIn *param0)
 {
     ov6_0224543C(param0);
     ov6_0224551C(param0);
     ov6_02244F74(param0);
     ov6_02245F64(param0, 1);
-    param0->unk_00++;
+    param0->state++;
     return 0;
 }
 
-static int ov6_022444D0(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022444D0(HMCutIn *param0)
 {
     if (ov6_02245470(param0) != 2) {
         return 0;
     }
 
     Sprite_SetAnim(param0->unk_248, 1);
-    param0->unk_00++;
+    param0->state++;
 
     return 0;
 }
 
-static int ov6_022444F8(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022444F8(HMCutIn *param0)
 {
     param0->unk_08++;
 
     if (param0->unk_08 >= 20) {
         param0->unk_08 = 0;
-        param0->unk_00++;
+        param0->state++;
 
         ov6_022456D4(param0);
     }
@@ -1448,7 +1450,7 @@ static int ov6_022444F8(UnkStruct_ov6_02243FFC *param0)
     return 1;
 }
 
-static int ov6_02244518(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244518(HMCutIn *param0)
 {
     if (ov6_02245470(param0) != 3) {
         return 0;
@@ -1458,12 +1460,12 @@ static int ov6_02244518(UnkStruct_ov6_02243FFC *param0)
 
     param0->unk_54 = 0x800;
     param0->unk_14 = 2;
-    param0->unk_00++;
+    param0->state++;
 
     return 1;
 }
 
-static int ov6_02244548(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244548(HMCutIn *param0)
 {
     param0->unk_2C = 0;
     param0->unk_4C += param0->unk_54;
@@ -1497,13 +1499,13 @@ static int ov6_02244548(UnkStruct_ov6_02243FFC *param0)
         ov6_02244F20(param0->fieldSystem->bgConfig);
         param0->unk_14 = 1;
         ov6_02244F58(param0);
-        param0->unk_00++;
+        param0->state++;
     }
 
     return 0;
 }
 
-static int ov6_022445EC(UnkStruct_ov6_02243FFC *param0)
+static int ov6_022445EC(HMCutIn *param0)
 {
     if (param0->unk_18 == 0) {
         if (ov6_02245470(param0) == 4) {
@@ -1524,20 +1526,20 @@ static int ov6_022445EC(UnkStruct_ov6_02243FFC *param0)
     }
 
     ov6_02245480(param0);
-    param0->unk_00++;
+    param0->state++;
     return 0;
 }
 
-static int ov6_02244634(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02244634(HMCutIn *param0)
 {
     if (IsScreenFadeDone()) {
-        param0->unk_00++;
+        param0->state++;
     }
 
     return 0;
 }
 
-static int (*const Unk_ov6_02249310[])(UnkStruct_ov6_02243FFC *) = {
+static int (*const Unk_ov6_02249310[])(HMCutIn *) = {
     ov6_02244038,
     ov6_022443EC,
     ov6_022440C0,
@@ -1563,21 +1565,21 @@ static int (*const Unk_ov6_02249310[])(UnkStruct_ov6_02243FFC *) = {
     ov6_022443B0
 };
 
-static void ov6_0224464C(UnkStruct_ov6_02243FFC *param0)
+static void ov6_0224464C(HMCutIn *param0)
 {
     param0->unk_268 = 0;
     param0->unk_26C = 0;
     param0->unk_278 = SysTask_ExecuteOnVBlank(ov6_022446B8, param0, 0x80);
 }
 
-static void ov6_02244674(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244674(HMCutIn *param0)
 {
     param0->unk_268 = 0;
     param0->unk_26C = 0;
     param0->unk_278 = SysTask_ExecuteOnVBlank(ov6_022447B4, param0, 0x80);
 }
 
-static void ov6_0224469C(UnkStruct_ov6_02243FFC *param0)
+static void ov6_0224469C(HMCutIn *param0)
 {
     if (param0->unk_278 != NULL) {
         SysTask_Done(param0->unk_278);
@@ -1588,7 +1590,7 @@ static void ov6_0224469C(UnkStruct_ov6_02243FFC *param0)
 static void ov6_022446B8(SysTask *param0, void *param1)
 {
     int v0;
-    UnkStruct_ov6_02243FFC *v1 = param1;
+    HMCutIn *v1 = param1;
 
     switch (v1->unk_268) {
     case 0:
@@ -1622,7 +1624,7 @@ static void ov6_022446B8(SysTask *param0, void *param1)
 static void ov6_02244734(SysTask *param0, void *param1)
 {
     int v0;
-    UnkStruct_ov6_02243FFC *v1 = param1;
+    HMCutIn *v1 = param1;
 
     if (v1->unk_268 == 1) {
         for (v0 = 0; v0 < 4; v0++) {
@@ -1654,7 +1656,7 @@ static void ov6_02244734(SysTask *param0, void *param1)
 
 static void ov6_022447B4(SysTask *param0, void *param1)
 {
-    UnkStruct_ov6_02243FFC *v0 = param1;
+    HMCutIn *v0 = param1;
     SpriteResource *v1 = SpriteResourceCollection_Find(v0->unk_200, 0);
 
     switch (v0->unk_268) {
@@ -1668,7 +1670,7 @@ static void ov6_022447B4(SysTask *param0, void *param1)
 
 static void ov6_022447EC(SysTask *param0, void *param1)
 {
-    UnkStruct_ov6_02243FFC *v0 = param1;
+    HMCutIn *v0 = param1;
     SpriteResource *v1 = SpriteResourceCollection_Find(v0->unk_200, 0);
 
     if (v0->unk_268 == 1) {
@@ -1678,32 +1680,32 @@ static void ov6_022447EC(SysTask *param0, void *param1)
     }
 }
 
-static void ov6_0224481C(UnkStruct_ov6_02243FFC *param0)
+static void ov6_0224481C(HMCutIn *cutIn)
 {
-    NARC *v0 = ov6_0224491C();
+    NARC *cutInNarc = GetFieldCutinNarc();
 
-    ov6_02244F80(param0, (FX32_ONE * 0), (FX32_ONE * 192), (FX32_ONE * 1), (FX32_ONE * 192));
-    ov6_02244F2C(param0);
+    ov6_02244F80(cutIn, (FX32_ONE * 0), (FX32_ONE * 192), (FX32_ONE * 1), (FX32_ONE * 192));
+    ov6_02244F2C(cutIn);
 
-    param0->unk_24 = Bg_GetPriority(param0->fieldSystem->bgConfig, 0);
-    param0->unk_26 = Bg_GetPriority(param0->fieldSystem->bgConfig, 3);
+    cutIn->bgPriority0 = Bg_GetPriority(cutIn->fieldSystem->bgConfig, BG_LAYER_MAIN_0);
+    cutIn->bgPriority3 = Bg_GetPriority(cutIn->fieldSystem->bgConfig, BG_LAYER_MAIN_3);
 
     G2_SetBG1Priority(1);
     G2_SetBG3Priority(0);
 
-    GXLayers_EngineAToggleLayers(GX_PLANEMASK_BG3, 0);
+    GXLayers_EngineAToggleLayers(GX_PLANEMASK_BG3, FALSE);
 
-    ov6_02244E54(v0, 2, &param0->unk_6C);
-    ov6_02244E7C(param0->fieldSystem->bgConfig, v0, 0, &param0->unk_68);
-    ov6_02244EB4(param0->fieldSystem->bgConfig, v0, 1, &param0->unk_64);
-    ov6_02244928(param0, v0);
+    ov6_02244E54(cutInNarc, 2, &cutIn->unk_6C);
+    ov6_02244E7C(cutIn->fieldSystem->bgConfig, cutInNarc, 0, &cutIn->unk_68);
+    ov6_02244EB4(cutIn->fieldSystem->bgConfig, cutInNarc, 1, &cutIn->unk_64);
+    ov6_02244928(cutIn, cutInNarc);
 
-    NARC_dtor(v0);
-    param0->unk_244 = sub_020711EC(HEAP_ID_FIELD, 32);
+    NARC_dtor(cutInNarc);
+    cutIn->unk_244 = sub_020711EC(HEAP_ID_FIELD, 32);
     GXLayers_EngineAToggleLayers(GX_PLANEMASK_BG3, 1);
 }
 
-static void ov6_022448C8(UnkStruct_ov6_02243FFC *param0)
+static void ov6_022448C8(HMCutIn *param0)
 {
     GXLayers_EngineAToggleLayers(GX_PLANEMASK_BG3, 0);
     sub_0207121C(param0->unk_244);
@@ -1711,19 +1713,19 @@ static void ov6_022448C8(UnkStruct_ov6_02243FFC *param0)
     ov6_02244F20(param0->fieldSystem->bgConfig);
     ov6_02244B6C(param0);
 
-    G2_SetBG0Priority(param0->unk_24);
-    G2_SetBG3Priority(param0->unk_26);
+    G2_SetBG0Priority(param0->bgPriority0);
+    G2_SetBG3Priority(param0->bgPriority3);
 
     FieldMessage_LoadTextPalettes(0, TRUE);
     GXLayers_EngineAToggleLayers(GX_PLANEMASK_BG3, 1);
 }
 
-static NARC *ov6_0224491C(void)
+static NARC *GetFieldCutinNarc(void)
 {
     return NARC_ctor(NARC_INDEX_DATA__FIELD_CUTIN, HEAP_ID_FIELD);
 }
 
-static void ov6_02244928(UnkStruct_ov6_02243FFC *param0, NARC *param1)
+static void ov6_02244928(HMCutIn *param0, NARC *param1)
 {
     int v0;
 
@@ -1740,7 +1742,7 @@ static void ov6_02244928(UnkStruct_ov6_02243FFC *param0, NARC *param1)
         param0->unk_210[v0] = SpriteResourceCollection_AddTilesFrom(param0->unk_200, param1, Unk_ov6_02249108[v0].unk_04, 0, Unk_ov6_02249108[v0].unk_00, NNS_G2D_VRAM_TYPE_2DMAIN, HEAP_ID_FIELD);
     }
 
-    if (param0->unk_0C == 0) {
+    if (param0->playerGender == 0) {
         param0->unk_210[v0] = SpriteResourceCollection_AddTilesFrom(param0->unk_200, param1, 13, 0, 2, NNS_G2D_VRAM_TYPE_2DMAIN, HEAP_ID_FIELD);
     } else {
         param0->unk_210[v0] = SpriteResourceCollection_AddTilesFrom(param0->unk_200, param1, 16, 0, 2, NNS_G2D_VRAM_TYPE_2DMAIN, HEAP_ID_FIELD);
@@ -1753,7 +1755,7 @@ static void ov6_02244928(UnkStruct_ov6_02243FFC *param0, NARC *param1)
         param0->unk_220[v0] = SpriteResourceCollection_AddPaletteFrom(param0->unk_204, param1, Unk_ov6_022490F8[v0].unk_04, 0, Unk_ov6_022490F8[v0].unk_00, NNS_G2D_VRAM_TYPE_2DMAIN, 1, HEAP_ID_FIELD);
     }
 
-    if (param0->unk_0C == 0) {
+    if (param0->playerGender == 0) {
         (void)0;
     } else {
         param0->unk_220[v0] = SpriteResourceCollection_AddPaletteFrom(param0->unk_204, param1, 4, 0, 1, NNS_G2D_VRAM_TYPE_2DMAIN, 1, HEAP_ID_FIELD);
@@ -1767,7 +1769,7 @@ static void ov6_02244928(UnkStruct_ov6_02243FFC *param0, NARC *param1)
             param0->unk_208, param1, Unk_ov6_02249118[v0].unk_04, 0, Unk_ov6_02249118[v0].unk_00, 2, 4);
     }
 
-    if (param0->unk_0C == 0) {
+    if (param0->playerGender == 0) {
         param0->unk_22C[v0] = SpriteResourceCollection_AddFrom(param0->unk_208, param1, 14, 0, 2, 2, HEAP_ID_FIELD);
     } else {
         param0->unk_22C[v0] = SpriteResourceCollection_AddFrom(param0->unk_208, param1, 17, 0, 2, 2, HEAP_ID_FIELD);
@@ -1780,17 +1782,17 @@ static void ov6_02244928(UnkStruct_ov6_02243FFC *param0, NARC *param1)
         param0->unk_23C[v0] = SpriteResourceCollection_AddFrom(param0->unk_20C, param1, Unk_ov6_02249100[v0].unk_04, 0, Unk_ov6_02249100[v0].unk_00, 3, HEAP_ID_FIELD);
     }
 
-    if (param0->unk_0C == 0) {
+    if (param0->playerGender == 0) {
         param0->unk_23C[v0] = SpriteResourceCollection_AddFrom(param0->unk_20C, param1, 15, 0, 1, 3, HEAP_ID_FIELD);
     } else {
         param0->unk_23C[v0] = SpriteResourceCollection_AddFrom(param0->unk_20C, param1, 18, 0, 1, 3, HEAP_ID_FIELD);
     }
 
-    param0->unk_270 = ov6_0224509C(param0->unk_5C, &param0->unk_258, HEAP_ID_FIELD);
+    param0->unk_270 = ov6_0224509C(param0->pokemon, &param0->unk_258, HEAP_ID_FIELD);
     param0->unk_274 = ov6_022450E4(&param0->unk_258, HEAP_ID_FIELD);
 }
 
-static void ov6_02244B6C(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244B6C(HMCutIn *param0)
 {
     int v0;
 
@@ -1826,14 +1828,14 @@ static void ov6_02244B6C(UnkStruct_ov6_02243FFC *param0)
     SpriteList_Delete(param0->unk_70);
 }
 
-static void ov6_02244C10(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244C10(HMCutIn *param0)
 {
     if (param0->unk_70 != NULL) {
         SpriteList_Update(param0->unk_70);
     }
 }
 
-static Sprite *ov6_02244C20(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1, u32 param2, u32 param3, u32 param4, u32 param5, int param6, int param7)
+static Sprite *ov6_02244C20(HMCutIn *param0, const VecFx32 *param1, u32 param2, u32 param3, u32 param4, u32 param5, int param6, int param7)
 {
     SpriteResourcesHeader v0;
     SpriteListTemplate v1;
@@ -1860,7 +1862,7 @@ static Sprite *ov6_02244C20(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param
     return v2;
 }
 
-static Sprite *ov6_02244CD4(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1, int param2, int param3)
+static Sprite *ov6_02244CD4(HMCutIn *param0, const VecFx32 *param1, int param2, int param3)
 {
     Sprite *v0 = ov6_02244C20(param0, param1, 1, 0, 1, 0, 0, param2);
     Sprite_SetAnim(v0, param3);
@@ -1868,12 +1870,12 @@ static Sprite *ov6_02244CD4(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param
     return v0;
 }
 
-static Sprite *ov6_02244CFC(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1)
+static Sprite *ov6_02244CFC(HMCutIn *param0, const VecFx32 *param1)
 {
     Sprite *v0;
     u32 v1 = 0;
 
-    if (param0->unk_0C == 1) {
+    if (param0->playerGender == 1) {
         v1 = 1;
     }
 
@@ -1891,7 +1893,7 @@ static void ov6_02244D34(Sprite *param0)
     Sprite_SetAnimSpeed(param0, FX32_ONE);
 }
 
-static Sprite *ov6_02244D4C(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1, int param2, int param3)
+static Sprite *ov6_02244D4C(HMCutIn *param0, const VecFx32 *param1, int param2, int param3)
 {
     Sprite *v0;
     VecFx32 v1 = { 0, 0, 0 };
@@ -1907,10 +1909,10 @@ static Sprite *ov6_02244D4C(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param
     return v0;
 }
 
-static void ov6_02244DB4(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244DB4(HMCutIn *param0)
 {
     int v0;
-    NARC *v1 = ov6_0224491C();
+    NARC *v1 = GetFieldCutinNarc();
 
     for (v0 = 0; v0 < 4; v0++) {
         if (param0->unk_210[v0] == NULL) {
@@ -1932,38 +1934,38 @@ static void ov6_02244DB4(UnkStruct_ov6_02243FFC *param0)
     NARC_dtor(v1);
 }
 
-static void ov6_02244E54(NARC *param0, u32 param1, NNSG2dPaletteData **param2)
+static void ov6_02244E54(NARC *narc, u32 memberIndex, NNSG2dPaletteData **plttData)
 {
-    void *v0 = NARC_AllocAndReadWholeMember(param0, param1, 4);
+    void *nclrFile = NARC_AllocAndReadWholeMember(narc, memberIndex, HEAP_ID_FIELD);
 
-    NNS_G2dGetUnpackedPaletteData(v0, param2);
+    NNS_G2dGetUnpackedPaletteData(nclrFile, plttData);
 
-    Bg_LoadPalette(3, (*param2)->pRawData, (32 * 1), (32 * 12));
+    Bg_LoadPalette(3, (*plttData)->pRawData, (32 * 1), (32 * 12));
+    Heap_Free(nclrFile);
+}
+
+static void ov6_02244E7C(BgConfig *bgConfig, NARC *narc, u32 memberIndex, NNSG2dCharacterData **charData)
+{
+    void *v0 = NARC_AllocAndReadWholeMember(narc, memberIndex, 4);
+    NNS_G2dGetUnpackedCharacterData(v0, charData);
+
+    Bg_LoadTiles(bgConfig, 3, (*charData)->pRawData, (*charData)->szByte, 0);
     Heap_Free(v0);
 }
 
-static void ov6_02244E7C(BgConfig *param0, NARC *param1, u32 param2, NNSG2dCharacterData **param3)
-{
-    void *v0 = NARC_AllocAndReadWholeMember(param1, param2, 4);
-    NNS_G2dGetUnpackedCharacterData(v0, param3);
-
-    Bg_LoadTiles(param0, 3, (*param3)->pRawData, (*param3)->szByte, 0);
-    Heap_Free(v0);
-}
-
-static void ov6_02244EB4(BgConfig *param0, NARC *param1, u32 param2, NNSG2dScreenData **param3)
+static void ov6_02244EB4(BgConfig *bgConfig, NARC *narc, u32 memberIndex, NNSG2dScreenData **screenData)
 {
     void *v0;
 
-    Bg_SetOffset(param0, BG_LAYER_MAIN_3, 0, 0);
-    Bg_SetOffset(param0, BG_LAYER_MAIN_3, 3, 0);
+    Bg_SetOffset(bgConfig, BG_LAYER_MAIN_3, 0, 0);
+    Bg_SetOffset(bgConfig, BG_LAYER_MAIN_3, 3, 0);
 
-    v0 = NARC_AllocAndReadWholeMember(param1, param2, 4);
-    NNS_G2dGetUnpackedScreenData(v0, param3);
+    v0 = NARC_AllocAndReadWholeMember(narc, memberIndex, 4);
+    NNS_G2dGetUnpackedScreenData(v0, screenData);
 
-    Bg_LoadTilemapBuffer(param0, 3, (void *)(*param3)->rawData, (*param3)->szByte);
-    Bg_ChangeTilemapRectPalette(param0, 3, 0, 0, 32, 32, 12);
-    Bg_CopyTilemapBufferToVRAM(param0, 3);
+    Bg_LoadTilemapBuffer(bgConfig, 3, (void *)(*screenData)->rawData, (*screenData)->szByte);
+    Bg_ChangeTilemapRectPalette(bgConfig, 3, 0, 0, 32, 32, 12);
+    Bg_CopyTilemapBufferToVRAM(bgConfig, 3);
     Heap_Free(v0);
 }
 
@@ -1972,7 +1974,7 @@ static void ov6_02244F20(BgConfig *param0)
     Bg_ClearTilemap(param0, BG_LAYER_MAIN_3);
 }
 
-static void ov6_02244F2C(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244F2C(HMCutIn *param0)
 {
     ov6_02244F8C(param0);
     param0->unk_2C = 0;
@@ -1984,17 +1986,17 @@ static void ov6_02244F2C(UnkStruct_ov6_02243FFC *param0)
     param0->unk_2C = 1;
 }
 
-static void ov6_02244F50(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244F50(HMCutIn *param0)
 {
     param0->unk_30 = (GX_WNDMASK_W0);
 }
 
-static void ov6_02244F58(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244F58(HMCutIn *param0)
 {
     param0->unk_30 = GX_WNDMASK_NONE;
 }
 
-static void ov6_02244F60(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244F60(HMCutIn *param0)
 {
     param0->unk_34 = (GX_WND_PLANEMASK_BG3) | GX_WND_PLANEMASK_OBJ;
     param0->unk_38 = 0;
@@ -2002,27 +2004,27 @@ static void ov6_02244F60(UnkStruct_ov6_02243FFC *param0)
     param0->unk_40 = 1;
 }
 
-static void ov6_02244F74(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244F74(HMCutIn *param0)
 {
     param0->unk_3C = (GX_WND_PLANEMASK_OBJ | GX_WND_PLANEMASK_BG0 | GX_WND_PLANEMASK_BG1 | GX_WND_PLANEMASK_BG2 | GX_WND_PLANEMASK_BG3) & (~(GX_WND_PLANEMASK_BG3));
     param0->unk_40 = 1;
 }
 
-static void ov6_02244F80(UnkStruct_ov6_02243FFC *param0, fx32 param1, fx32 param2, fx32 param3, fx32 param4)
+static void ov6_02244F80(HMCutIn *cutIn, fx32 param1, fx32 param2, fx32 param3, fx32 param4)
 {
-    param0->unk_44 = param1;
-    param0->unk_48 = param3;
-    param0->unk_4C = param2;
-    param0->unk_50 = param4;
+    cutIn->unk_44 = param1;
+    cutIn->unk_48 = param3;
+    cutIn->unk_4C = param2;
+    cutIn->unk_50 = param4;
 }
 
-static void ov6_02244F8C(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244F8C(HMCutIn *param0)
 {
     GF_ASSERT(param0->unk_27C == NULL);
     param0->unk_27C = SysTask_ExecuteOnVBlank(ov6_02244FE4, param0, 0x81);
 }
 
-static void ov6_02244FB4(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02244FB4(HMCutIn *param0)
 {
     GF_ASSERT(param0->unk_27C != NULL);
 
@@ -2032,7 +2034,7 @@ static void ov6_02244FB4(UnkStruct_ov6_02243FFC *param0)
 
 static void ov6_02244FE4(SysTask *param0, void *param1)
 {
-    UnkStruct_ov6_02243FFC *v0 = param1;
+    HMCutIn *v0 = param1;
 
     if (v0->unk_2C == 0) {
         return;
@@ -2044,9 +2046,9 @@ static void ov6_02244FE4(SysTask *param0, void *param1)
     G2_SetWnd0Position(v0->unk_44 / FX32_ONE, v0->unk_4C / FX32_ONE, v0->unk_48 / FX32_ONE, v0->unk_50 / FX32_ONE);
 }
 
-static void ov6_0224508C(UnkStruct_ov6_02243FFC *param0, PokemonSpriteTemplate *param1)
+static void ov6_0224508C(HMCutIn *param0, PokemonSpriteTemplate *param1)
 {
-    Pokemon_BuildSpriteTemplate(param1, param0->unk_5C, 2);
+    Pokemon_BuildSpriteTemplate(param1, param0->pokemon, 2);
 }
 
 static void *ov6_0224509C(Pokemon *param0, PokemonSpriteTemplate *param1, u32 heapID)
@@ -2069,13 +2071,13 @@ static void *ov6_022450E4(PokemonSpriteTemplate *param0, u32 heapID)
     return v0;
 }
 
-static SpriteResource *ov6_022450F4(UnkStruct_ov6_02243FFC *param0, NARC *param1)
+static SpriteResource *ov6_022450F4(HMCutIn *param0, NARC *param1)
 {
     SpriteResource *v0 = SpriteResourceCollection_AddTilesFrom(param0->unk_200, param1, 5, 0, 3, NNS_G2D_VRAM_TYPE_2DMAIN, HEAP_ID_FIELD);
     return v0;
 }
 
-static void ov6_02245118(UnkStruct_ov6_02243FFC *param0, void *param1)
+static void ov6_02245118(HMCutIn *param0, void *param1)
 {
     u32 v0;
     SpriteResource *v1;
@@ -2089,13 +2091,13 @@ static void ov6_02245118(UnkStruct_ov6_02243FFC *param0, void *param1)
     GX_LoadOBJ(param1, v0, ((32 * 10) * 10));
 }
 
-static SpriteResource *ov6_0224514C(UnkStruct_ov6_02243FFC *param0, NARC *param1)
+static SpriteResource *ov6_0224514C(HMCutIn *param0, NARC *param1)
 {
     SpriteResource *v0 = SpriteResourceCollection_AddPaletteFrom(param0->unk_204, param1, 3, 0, 2, NNS_G2D_VRAM_TYPE_2DMAIN, 1, HEAP_ID_FIELD);
     return v0;
 }
 
-static void ov6_02245170(UnkStruct_ov6_02243FFC *param0, void *param1)
+static void ov6_02245170(HMCutIn *param0, void *param1)
 {
     u32 v0;
     SpriteResource *v1;
@@ -2113,7 +2115,7 @@ static void ov6_02245170(UnkStruct_ov6_02243FFC *param0, void *param1)
     GX_LoadOBJPltt(param1, v0, 32);
 }
 
-static void ov6_022451B8(UnkStruct_ov6_02243FFC *param0)
+static void ov6_022451B8(HMCutIn *param0)
 {
     int v0;
     SpriteResource *v1 = SpriteResourceCollection_Find(param0->unk_200, 3);
@@ -2157,7 +2159,7 @@ static void ov6_022451B8(UnkStruct_ov6_02243FFC *param0)
     GF_ASSERT(v0 < 4);
 }
 
-static Sprite *ov6_0224529C(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1)
+static Sprite *ov6_0224529C(HMCutIn *param0, const VecFx32 *param1)
 {
     Sprite *v0 = ov6_02244C20(param0, param1, 3, 2, 3, 0xffffffff, 0, 129);
     return v0;
@@ -2181,7 +2183,7 @@ static const UnkStruct_ov6_0224936C Unk_ov6_0224936C[13] = {
     { (FX32_ONE * 221), (FX32_ONE * 124), (FX32_ONE * 24), 0x80, 0x1 }
 };
 
-static void ov6_022452BC(UnkStruct_ov6_02243FFC *param0, int param1)
+static void ov6_022452BC(HMCutIn *param0, int param1)
 {
     int v0, v1, v2;
     VecFx32 v3, v4;
@@ -2204,7 +2206,7 @@ static void ov6_022452BC(UnkStruct_ov6_02243FFC *param0, int param1)
     }
 }
 
-static void ov6_02245328(UnkStruct_ov6_02243FFC *param0, const VecFx32 *param1, const VecFx32 *param2, int param3, int param4, int param5)
+static void ov6_02245328(HMCutIn *param0, const VecFx32 *param1, const VecFx32 *param2, int param3, int param4, int param5)
 {
     UnkStruct_ov101_021D5D90 *v0;
     UnkStruct_ov6_02245328 v1;
@@ -2254,7 +2256,7 @@ static void ov6_022453B8(UnkStruct_ov101_021D5D90 *param0, void *param1)
     Sprite_SetPosition(v1->unk_08, &v0);
 
     if (v1->unk_0C.unk_04 == 1) {
-        UnkStruct_ov6_02243FFC *v2 = v1->unk_0C.unk_08;
+        HMCutIn *v2 = v1->unk_0C.unk_08;
 
         if (v2->unk_14 == 2) {
             int v3 = 0;
@@ -2284,7 +2286,7 @@ static const UnkStruct_ov101_021D86B0 Unk_ov6_02249220 = {
     ov6_02245438
 };
 
-static void ov6_0224543C(UnkStruct_ov6_02243FFC *param0)
+static void ov6_0224543C(HMCutIn *param0)
 {
     VecFx32 v0 = { 0, 0, 0 };
     UnkStruct_ov6_0224543C v1;
@@ -2293,13 +2295,13 @@ static void ov6_0224543C(UnkStruct_ov6_02243FFC *param0)
     param0->unk_250 = sub_02071330(param0->unk_244, &Unk_ov6_02249248, &v0, 0, &v1, 130);
 }
 
-static int ov6_02245470(UnkStruct_ov6_02243FFC *param0)
+static int ov6_02245470(HMCutIn *param0)
 {
     UnkStruct_ov6_02249198 *v0 = sub_02071598(param0->unk_250);
     return v0->unk_02;
 }
 
-static void ov6_02245480(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02245480(HMCutIn *param0)
 {
     UnkStruct_ov6_02249198 *v0 = sub_02071598(param0->unk_250);
 
@@ -2375,7 +2377,7 @@ static int (*const Unk_ov6_022490E8[])(UnkStruct_ov6_02249198 *) = {
     ov6_0224550C
 };
 
-static void ov6_0224551C(UnkStruct_ov6_02243FFC *param0)
+static void ov6_0224551C(HMCutIn *param0)
 {
     VecFx32 v0 = { (FX32_ONE * (128 + 8)), (FX32_ONE * (96 - 8)), 0 };
     VecFx32 v1 = { 0x400, 0x400, 0 };
@@ -2464,7 +2466,7 @@ static int (*const Unk_ov6_022490F0[])(UnkStruct_ov6_02249198 *) = {
     ov6_022456D0
 };
 
-static void ov6_022456D4(UnkStruct_ov6_02243FFC *param0)
+static void ov6_022456D4(HMCutIn *param0)
 {
     VecFx32 v0 = { (FX32_ONE * 128), (FX32_ONE * 104), 0 };
     VecFx32 v1 = { 0x1400, 0x1400, 0 };
@@ -3035,7 +3037,7 @@ static void *ov6_02245F44(u32 heapID, int param1)
     return v0;
 }
 
-static void ov6_02245F64(UnkStruct_ov6_02243FFC *param0, int param1)
+static void ov6_02245F64(HMCutIn *param0, int param1)
 {
     MapObject *v0 = Player_MapObject(param0->fieldSystem->playerAvatar);
 
@@ -3082,7 +3084,7 @@ static const UnkStruct_ov101_021D86B0 Unk_ov6_02249234 = {
     sub_020715FC
 };
 
-static void ov6_02245FDC(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02245FDC(HMCutIn *param0)
 {
     VecFx32 v0 = { 0, 0, 0 };
     UnkStruct_ov6_02245F80 v1;
@@ -3093,7 +3095,7 @@ static void ov6_02245FDC(UnkStruct_ov6_02243FFC *param0)
     param0->unk_254 = sub_02071330(param0->unk_244, &Unk_ov6_02249234, &v0, 0, &v1, 134);
 }
 
-static void ov6_02246018(UnkStruct_ov6_02243FFC *param0)
+static void ov6_02246018(HMCutIn *param0)
 {
     if (param0->unk_254 != NULL) {
         sub_0207136C(param0->unk_254);
